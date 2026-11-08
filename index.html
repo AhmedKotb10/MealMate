@@ -52,8 +52,8 @@ footer{text-align:center;padding:8px 0 4px}footer button{background:none;border:
 <div id="cb" hidden></div>
 <script>
 const TAGS=["لحمة","فراخ","بومب","تخن","سريع","متوسط","وقت","جوسي","هيلثي","خفيفة","نادر","مصري","لحمة","فراخ","سمك","شتوي"];
-const LBL={متوسط:"متوسط السرعة",وقت:"محتاج وقت",نادر:"تكرار قليل",بومب:"بومب 💨"};
-const D=[["برجر","لحمة مفرومة + عيش + بطاطس",1,"جوسي سريع تخن"],["صينية لحمة + مكرونة حمرا + سلطة خس","لحمة + طماطم + مكرونة + خس",2,"متوسط"],["ملوخية + أرز + سلطة + فراخ","ملوخية + خضار سلطة + فراخ + أرز",1,"بومب سريع مصري"],["محشي كرنب + فراخ + سلطة خس","كرنب + خضرا + أرز + فراخ + خس",2,"بومب وقت مصري نادر"],["حواوشي + سلطة + طحينة","لحمة مفرومة + عيش بلدي + خضار سلطة",1,"تخن بومب جوسي"],["كشري","عدس + بصل + طماطم + أرز",2,"بومب تخن متوسط نادر"],["شوربة عدس + عيش محمص","عدس + جزر + بطاطس",1,"سريع بومب شتوي نادر"],["مكرونة بشاميل + سلطة خس","لبن + خس + جبنة + مكرونة",2,"تخن سريع"],["سلطة كينوا + فراخ + شوربة","فراخ + بنجر + أفوكادو + رمان + خس + خضرا",1,"خفيفة هيلثي سريع"],["كسادياز فراخ + بطاطس + سلطة","تورتيا + فراخ + فلفل + بطاطس + جبنة",1,"تخن سريع"],["فريك + لحمة + خضار سوتيه","فريك + لحمة + خضار",2,"متوسط هيلثي"],["سمك مشوي + أرز سمك + سلطة + طحينة","سمك + خضار سلطة + أرز",1,"متوسط بومب سمك"],["طاجن جمبري وسمك + أرز سمك","جمبري + سمك + أرز + فلفل",1,"سريع سمك"],["محشي فلفل + لحمة + سلطة","فلفل + أرز + خضرا + لحمة + بصل",2,"وقت تخن مصري نادر"],["نجريسكو + سلطة","مشروم + فراخ + لبن + جبنة + خضار سلطة",2,"تخن وقت"],["حندوقية + مكرونة","فراخ + فلفل + طماطم + مكرونة",1,"سريع جوسي"],["أرز + بامية + سلطة فلفل","بامية + فلفل + ليمون + طماطم + لحمة + أرز",2,"بومب متوسط مصري"],["أرز + بسلة","بسلة + أرز + طماطم + لحمة",2,"متوسط تخن مصري"],["صينية بطاطس باللحمة","بطاطس + طماطم + لحمة",2,"تخن وقت"],["مكرونة حمرا + استربس + سلطة","استربس + طماطم + خضار سلطة + مكرونة",1,"سريع"],["فتة + أرز + لحمة","عيش بلدي + لحمة + طماطم + أرز",2,"تخن وقت مصري"],["سندوتشات فرايد تشيكن","كايزر + فراخ + بطاطس",1,"سريع جوسي"]];let editId=null,pick=null,col=null,meals=[],db=null,canW=true,view="today",sel=new Set(),cur=null,plan=null,loaded=false,delId=null;
+const LBL={متوسط:"متوسط السرعة",وقت:"محتاج وقت",نادر:"تكرار قليل",بومب:"انتفاخ 💨",جوسي:"Juicy"};
+const D=[["برجر","لحمة مفرومة + عيش + بطاطس",1,"جوسي سريع تخن"],["صينية لحمة + مكرونة ريد صوص + سلطة خس","لحمة + طماطم + مكرونة + خس",2,"متوسط"],["ملوخية + أرز + سلطة + فراخ","ملوخية + خضار سلطة + فراخ + أرز",1,"بومب سريع مصري"],["محشي كرنب + فراخ + سلطة خس","كرنب + خضرا + أرز + فراخ + خس",2,"بومب وقت مصري نادر"],["حواوشي + سلطة + طحينة","لحمة مفرومة + عيش بلدي + خضار سلطة",1,"تخن بومب جوسي"],["كشري","عدس + بصل + طماطم + أرز",2,"بومب تخن متوسط نادر"],["شوربة عدس + عيش محمص","عدس + جزر + بطاطس",1,"سريع بومب شتوي نادر"],["مكرونة بشاميل + سلطة خس","لبن + خس + جبنة + مكرونة",2,"تخن سريع"],["سلطة كينوا + فراخ + شوربة","فراخ + بنجر + أفوكادو + رمان + خس + خضرا",1,"خفيفة هيلثي سريع"],["كسادياز فراخ + بطاطس + سلطة","تورتيا + فراخ + فلفل + بطاطس + جبنة",1,"تخن سريع"],["فريك + لحمة + خضار سوتيه","فريك + لحمة + خضار",2,"متوسط هيلثي"],["سمك مشوي + أرز سمك + سلطة + طحينة","سمك + خضار سلطة + أرز",1,"متوسط بومب سمك"],["طاجن جمبري وسمك + أرز سمك","جمبري + سمك + أرز + فلفل",1,"سريع سمك"],["محشي فلفل + لحمة + سلطة","فلفل + أرز + خضرا + لحمة + بصل",2,"وقت تخن مصري نادر"],["نجريسكو + سلطة","مشروم + فراخ + لبن + جبنة + خضار سلطة",2,"تخن وقت"],["فاهيتا حندوقية + مكرونة","فراخ + فلفل + طماطم + مكرونة",1,"سريع جوسي"],["أرز + بامية + سلطة فلفل","بامية + فلفل + ليمون + طماطم + لحمة + أرز",2,"بومب متوسط مصري"],["أرز + بسلة","بسلة + أرز + طماطم + لحمة",2,"متوسط تخن مصري"],["صينية بطاطس باللحمة","بطاطس + طماطم + لحمة",2,"تخن وقت"],["مكرونة ريد صوص + استربس + سلطة","استربس + طماطم + خضار سلطة + مكرونة",1,"سريع"],["فتة + أرز + لحمة","عيش بلدي + لحمة + طماطم + أرز",2,"تخن وقت مصري"],["سندوتشات فرايد تشيكن","كايزر + فراخ + بطاطس",1,"سريع جوسي"]];let saved=null,planStart=Date.now(),editId=null,pick=null,col=null,meals=[],db=null,canW=true,view="today",sel=new Set(),cur=null,plan=null,loaded=false,delId=null;
 const $=s=>document.querySelector(s);
 const note=t=>{const m=$("#msg");if(m)m.textContent=t};const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const has=(m,t)=>m.t.includes(t);
@@ -107,9 +107,9 @@ function genPlan(){
     const s=score(pl)-left*50;
     if(s>bs){bs=s;best=pl}
   }
-  plan=best;
+  plan=best;planStart=Date.now();
 }
-const dayName=i=>new Date(Date.now()+i*864e5).toLocaleDateString("ar-EG",{weekday:"long"});
+const dayName=i=>new Date(planStart+i*864e5).toLocaleDateString("ar-EG",{weekday:"long"});
 
 function render(){
   document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===view));
@@ -123,11 +123,12 @@ function render(){
     (cur?`<div class="card"><p class="big">${esc(cur.n)}</p><div class="mu">${esc(cur.i)}</div>${dayB(cur)}${tagsH(cur)}</div>`:'<div id="st">مفيش وجبة بالفلاتر دي.</div>')+
     '<button class="pri" id="again">🎲 اقترح حاجة تانية</button>';
   }else if(view==="week"){
+    if(!plan&&saved&&saved.ids){const np=saved.ids.map(id=>meals.find(x=>x.id===id));if(np.length&&np.every(Boolean)){plan=np;planStart=saved.at||Date.now()}}
     if(!plan||plan.some(m=>!meals.includes(m)))genPlan();
     let d=0;
     a.innerHTML=(plan||[]).map((m,k)=>{const x=dayName(d),y=m.d==2?" + "+dayName(d+1):"";d+=m.d;
       return `<div class="card"><div class="row"><div class="day">${esc(x+y)}</div><span><button class="sm" data-sw="${k}">🔄 غيّر</button> <button class="sm" data-pick="${k}">📋 اختار</button></span></div><p class="big">${esc(m.n)}</p><div class="mu">${esc(m.i)}</div>${tagsH(m)}${pick===k?pickH(k):""}</div>`}).join("")+
-    '<button class="pri" id="regen">🔄 خطة تانية</button>';
+    '<button class="pri" id="savep">💾 حفظ الخطة</button><button class="sm" id="regen" style="width:100%;margin-top:8px;padding:10px">🔄 خطة تانية</button>'+(saved?'<button class="sm" id="delp" style="width:100%;margin-top:8px;padding:8px">مسح الخطة المحفوظة</button>':"");
     if(!plan||!plan.length)a.innerHTML='<div id="st">محتاج وجبات أكتر عشان أعمل خطة.</div>';
   }else{
     a.innerHTML=(canW&&!(editId&&meals.some(x=>x.id===editId))?formH(null):"")+
@@ -142,7 +143,9 @@ document.addEventListener("click",async e=>{
   if(b.id==="again"){pickToday();render();return}
   if(b.dataset.pick){const k=+b.dataset.pick;pick=pick===k?null:k;render();return}
   if(b.dataset.sw){swap(+b.dataset.sw);return}
-  if(b.id==="regen"){plan=null;pick=null;render();return}
+  if(b.id==="regen"){genPlan();pick=null;render();return}
+  if(b.id==="savep"){if(!plan||!plan.length)return;b.disabled=true;try{await col.doc("_plan").set({ids:plan.map(m=>m.id),at:planStart});note("اتحفظت الخطة ✓")}catch(e){note("معرفتش أحفظ الخطة: "+(e&&(e.code||e.message)||"خطأ"))}b.disabled=false;return}
+  if(b.id==="delp"){try{await col.doc("_plan").delete();saved=null;note("اتمسحت الخطة المحفوظة ✓");render()}catch(e){note("معرفتش أمسحها: "+(e&&(e.code||e.message)||"خطأ"))}return}
   if(b.dataset.nt){b.classList.toggle("on");return}
   if(b.dataset.x){showTx=false;xfer=xfer===b.dataset.x?null:b.dataset.x;render();return}
   if(b.id==="cpy"){const tx=exp();let ok=false;
@@ -197,8 +200,9 @@ setTimeout(()=>{if(!loaded){loaded=true;render()}},10000);
     if(!col){db=1;col=localCol();note("⚠️ التعديلات بتتحفظ في المتصفح ده بس")}else note("✓ التعديلات بتتحفظ على حسابك")
     if(col)col.onSnapshot(s=>{
       if(!s.docs.some(d=>d.id==="_s")){if(s.metadata&&s.metadata.fromCache)return;D.forEach((x,k)=>col.doc("m"+String(k+1).padStart(2,"0")).set({n:x[0],i:x[1],d:x[2],t:x[3].split(" ")}));col.doc("_s").set({v:1});return}
-      meals=s.docs.filter(d=>d.id!=="_s").map(d=>norm(d.id,d.data())).filter(m=>m.n).sort((a,b)=>a.id.localeCompare(b.id,undefined,{numeric:true}));
-      loaded=true;cur=null;if(!document.activeElement||document.activeElement.tagName!=="INPUT"&&document.activeElement.tagName!=="TEXTAREA")render()},()=>{loaded=true;render()});
+      meals=s.docs.filter(d=>!["_s","_plan"].includes(d.id)).map(d=>norm(d.id,d.data())).filter(m=>m.n).sort((a,b)=>a.id.localeCompare(b.id,undefined,{numeric:true}));
+      {const RN={"حندوقية + مكرونة":"فاهيتا حندوقية + مكرونة","مكرونة حمرا + استربس + سلطة":"مكرونة ريد صوص + استربس + سلطة","صينية لحمة + مكرونة حمرا + سلطة خس":"صينية لحمة + مكرونة ريد صوص + سلطة خس"};s.docs.forEach(d=>{const o=d.data();if(o&&RN[o.n])col.doc(d.id).set({...o,n:RN[o.n]})})}
+      {const pd=s.docs.find(d=>d.id==="_plan");saved=pd?pd.data():null}if(plan){const np=plan.map(m=>meals.find(x=>x.id===m.id));plan=np.every(Boolean)?np:null}cur=cur&&meals.find(x=>x.id===cur.id)||null;loaded=true;if(!document.activeElement||document.activeElement.tagName!=="INPUT"&&document.activeElement.tagName!=="TEXTAREA")render()},()=>{loaded=true;render()});
   }catch(_){}
   loaded=true;render();
 })();
