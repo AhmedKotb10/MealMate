@@ -27,8 +27,9 @@ button.tg{cursor:pointer;border:1px solid var(--ln);background:var(--card);color
 .sm{background:var(--card);border:1px solid var(--ln);color:var(--mu);border-radius:10px;padding:4px 11px;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
 .sm:hover{border-color:var(--ac);color:var(--ac)}
 .sm.red{color:var(--red);border-color:var(--red)}.sm.red:hover{background:var(--red);color:var(--on)}
-input,select{width:100%;padding:11px 12px;border:1px solid var(--ln);border-radius:12px;background:var(--bg);color:var(--tx);font:inherit;margin:4px 0 8px}
-input:focus,select:focus{outline:2px solid var(--ac);outline-offset:1px;border-color:transparent}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--ln);border-radius:12px;background:var(--bg);color:var(--tx);font:inherit;margin:4px 0 8px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--ac);outline-offset:1px;border-color:transparent}
+textarea{direction:ltr;font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;resize:vertical}
 .row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
 .row>p{flex:1;min-width:0;overflow-wrap:anywhere;margin:0}.row>span,.row>button{flex-shrink:0;white-space:nowrap}
 .day{color:var(--ac);font-weight:700;font-size:14px}
@@ -62,6 +63,11 @@ function formH(m){const e=!!m,t=e?m.t:[];return `<div class="card"><b>${e?"✏�
       <div class="tags" style="margin:0 0 8px">${allTags().map(x=>`<button class="tg${t.includes(x)?" on":""}" data-nt="${esc(x)}">${esc(LBL[x]||x)}</button>`).join("")}</div>
       <input id="fl" placeholder="label جديد (افصل بينهم بفاصلة)" maxlength="60">
       <button class="pri" id="${e?"save":"add"}">${e?"حفظ التعديل":"حفظ"}</button>${e?`<button class="sm" id="cancel" style="width:100%;margin-top:6px">إلغاء</button>`:""}</div>`}
+let xfer=null,showTx=false;const exp=()=>JSON.stringify(meals.map(m=>({n:m.n,i:m.i,d:m.d,t:m.t})));
+function xferH(){const bt=`<div class="row" style="margin-bottom:12px"><button class="sm" data-x="ex" style="flex:1;padding:8px">تصدير الوجبات</button><button class="sm" data-x="im" style="flex:1;padding:8px">استيراد وجبات</button></div>`;
+  if(xfer==="ex")return bt+`<div class="card"><b>تصدير</b><p class="mu">دوس «نسخ الوجبات» والصقها في ملاحظات أو رسالة لنفسك، أو نزّلها كملف. وبعدين افتح أي نسخة تانية من الصفحة واستوردها.</p>${showTx?`<textarea id="xo" readonly rows="6">${esc(exp())}</textarea>`:""}<button class="pri" id="cpy">نسخ الوجبات</button><button class="sm" id="dl" style="width:100%;margin-top:8px;padding:8px">تنزيل كملف</button></div>`;
+  if(xfer==="im")return bt+`<div class="card"><b>استيراد</b><p class="mu">الصق النص اللي صدّرته هنا، أو اختار الملف. الوجبات اللي بنفس الاسم مش هتتكرر.</p><input type="file" id="impf" accept=".json,.txt,application/json"><textarea id="imp" rows="6" placeholder="الصق هنا"></textarea><button class="pri" id="doimp">استيراد</button></div>`;
+  return bt}
 const norm=(id,o)=>({id,n:String(o.n||"").slice(0,80),i:String(o.i||"").slice(0,200),d:o.d==1?1:2,t:Array.isArray(o.t)?o.t.map(x=>String(x).trim().slice(0,20)).filter(Boolean).slice(0,15):[]});
 
 function pickToday(){
@@ -116,7 +122,7 @@ function render(){
     if(!plan||!plan.length)a.innerHTML='<div id="st">محتاج وجبات أكتر عشان أعمل خطة.</div>';
   }else{
     a.innerHTML=(canW?formH(editId?meals.find(x=>x.id===editId):null):"")+
-    `<p class="mu">${meals.length} وجبة</p>`+meals.map(m=>`<div class="card"><div class="row"><p class="big" style="font-size:17px">${esc(m.n)}</p>${canW?`<span><button class="sm" data-ed="${esc(m.id)}">✏️ تعديل</button> <button class="sm red" data-del="${esc(m.id)}">${delId===m.id?"تأكيد الحذف؟":"حذف"}</button></span>`:""}</div><div class="mu">${esc(m.i)}</div>${dayB(m)}${tagsH(m)}</div>`).join("");
+    xferH()+`<p class="mu">${meals.length} وجبة</p>`+meals.map(m=>`<div class="card"><div class="row"><p class="big" style="font-size:17px">${esc(m.n)}</p>${canW?`<span><button class="sm" data-ed="${esc(m.id)}">✏️ تعديل</button> <button class="sm red" data-del="${esc(m.id)}">${delId===m.id?"تأكيد الحذف؟":"حذف"}</button></span>`:""}</div><div class="mu">${esc(m.i)}</div>${dayB(m)}${tagsH(m)}</div>`).join("");
   }
 }
 document.addEventListener("click",async e=>{
@@ -128,6 +134,16 @@ document.addEventListener("click",async e=>{
   if(b.dataset.sw){swap(+b.dataset.sw);return}
   if(b.id==="regen"){plan=null;pick=null;render();return}
   if(b.dataset.nt){b.classList.toggle("on");return}
+  if(b.dataset.x){showTx=false;xfer=xfer===b.dataset.x?null:b.dataset.x;render();return}
+  if(b.id==="cpy"){const tx=exp();let ok=false;
+    try{await navigator.clipboard.writeText(tx);ok=true}catch(_){try{const t=document.createElement("textarea");t.value=tx;t.style.cssText="position:fixed;opacity:0";document.body.appendChild(t);t.select();ok=document.execCommand("copy");t.remove()}catch(__){}}
+    if(ok)note("اتنسخت الوجبات ✓");else{showTx=true;render();note("النسخ التلقائي مش متاح هنا. انسخ النص يدوياً من الخانة.")}return}
+  if(b.id==="dl"){try{const u=URL.createObjectURL(new Blob([exp()],{type:"application/json"})),a=document.createElement("a");a.href=u;a.download="meals.json";document.body.appendChild(a);a.click();a.remove();note("لو التنزيل ماحصلش، استخدم زرار نسخ الوجبات.")}catch(_){note("التنزيل مش متاح هنا، استخدم زرار نسخ الوجبات.")}return}
+  if(b.id==="doimp"){let arr;try{arr=JSON.parse($("#imp").value)}catch(_){note("النص مش صالح. اتأكد إنك لصقته كامل.");return}
+    if(!Array.isArray(arr)){note("الصيغة غلط.");return}
+    const have=new Set(meals.map(m=>m.n.trim()));let c=0,k=0;b.disabled=true;
+    try{for(const o of arr.slice(0,200)){const m=norm("",o||{});if(!m.n||have.has(m.n.trim())){k++;continue}have.add(m.n.trim());await col.doc("m"+Date.now().toString(36)+Math.random().toString(36).slice(2,5)).set({n:m.n,i:m.i,d:m.d,t:m.t});c++}plan=null;xfer=null;note("اتضافت "+c+" وجبة، وتخطّيت "+k+" (موجودة قبل كده).")}catch(e){note("معرفتش أستورد: "+(e&&(e.code||e.message)||"خطأ"))}
+    b.disabled=false;render();return}
   if(b.dataset.ed){editId=b.dataset.ed;render();return}
   if(b.id==="cancel"){editId=null;render();return}
   if(b.id==="save"){const n=$("#fn").value.trim(),i=$("#fi").value.trim();if(!n)return;b.disabled=true;
@@ -151,7 +167,8 @@ function setMeal(k,m){const o=plan[k];
     if(c.length){const r=c.map(x=>{const p=plan.slice();p.splice(k+1,0,x);return[score(p),x]}).sort((a,b)=>b[0]-a[0])[0][1];plan.splice(k+1,0,r)}}
   else plan[k]=m;
   pick=null;render()}
-document.addEventListener("change",e=>{const s=e.target.closest("select[data-pk]");if(!s||!s.value)return;const m=meals.find(x=>x.id===s.value);if(m)setMeal(+s.dataset.pk,m)});
+document.addEventListener("change",e=>{if(e.target.id==="impf"){const f=e.target.files[0];if(f)f.text().then(t=>{$("#imp").value=t;note("اتقرا الملف. دوس استيراد.")});return}
+  const s=e.target.closest("select[data-pk]");if(!s||!s.value)return;const m=meals.find(x=>x.id===s.value);if(m)setMeal(+s.dataset.pk,m)});
 function swap(k){const cand=meals.filter(m=>!plan.includes(m)&&m.d===plan[k].d);
   if(!cand.length){note("مفيش بديل بنفس المدة. ضيف وجبات أكتر.");return}
   const r=cand.map(m=>{const p=plan.slice();p[k]=m;return[score(p),m]}).sort((a,b)=>b[0]-a[0]).slice(0,3);
@@ -171,7 +188,7 @@ setTimeout(()=>{if(!loaded){loaded=true;render()}},10000);
     if(col)col.onSnapshot(s=>{
       if(!s.docs.some(d=>d.id==="_s")){if(s.metadata&&s.metadata.fromCache)return;D.forEach((x,k)=>col.doc("m"+String(k+1).padStart(2,"0")).set({n:x[0],i:x[1],d:x[2],t:x[3].split(" ")}));col.doc("_s").set({v:1});return}
       meals=s.docs.filter(d=>d.id!=="_s").map(d=>norm(d.id,d.data())).filter(m=>m.n).sort((a,b)=>a.id.localeCompare(b.id,undefined,{numeric:true}));
-      loaded=true;cur=null;if(!document.activeElement||document.activeElement.tagName!=="INPUT")render()},()=>{loaded=true;render()});
+      loaded=true;cur=null;if(!document.activeElement||document.activeElement.tagName!=="INPUT"&&document.activeElement.tagName!=="TEXTAREA")render()},()=>{loaded=true;render()});
   }catch(_){}
   loaded=true;render();
 })();
