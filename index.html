@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Meal Mate – غداء الأسبوع</title>
+<title>Umama</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#f4f6f7;--card:#fff;--tx:#17212b;--mu:#667585;--ac:#0f766e;--ac2:#e3f1ee;--ln:#e2e7eb;--on:#fff;--red:#b42318;--sh:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.06);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -34,17 +34,24 @@ textarea{direction:ltr;font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;resiz
 .row>p{flex:1;min-width:0;overflow-wrap:anywhere;margin:0}.row>span,.row>button{flex-shrink:0;white-space:nowrap}
 .day{color:var(--ac);font-weight:700;font-size:14px}
 #st{text-align:center;color:var(--mu);padding:24px}
+#cb{position:fixed;inset:auto 0 0 0;padding:12px 12px calc(12px + env(safe-area-inset-bottom,0px));z-index:50}
+#cb .bx{max-width:640px;margin:0 auto;background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:14px;box-shadow:0 8px 30px rgba(0,0,0,.18)}
+#cb .bt{display:flex;gap:8px;margin-top:10px}
+#cb .bt button{flex:1;padding:10px;border-radius:12px;border:1px solid var(--ln);background:var(--card);color:var(--tx);font:inherit;font-weight:700;cursor:pointer}
+footer{text-align:center;padding:8px 0 4px}footer button{background:none;border:0;color:var(--mu);font:inherit;font-size:13px;text-decoration:underline;cursor:pointer}
 </style>
 </head>
 <body>
 <main>
-<h1>🍽️ Meal Mate</h1><p class="mu" style="margin-top:-8px">هنأكل ايه النهارده؟</p>
+<h1>🍽️ Umama</h1><p class="mu" style="margin-top:-8px">هنأكل ايه النهارده؟</p>
 <nav><button data-v="today" class="on">النهارده</button><button data-v="week">الأسبوع</button><button data-v="all">الوجبات</button></nav>
 <div id="msg" class="mu" style="text-align:center;min-height:22px;margin-bottom:8px"></div>
 <div id="app"></div>
 </main>
+<footer id="ft" hidden><button id="pv">إعدادات الخصوصية</button></footer>
+<div id="cb" hidden></div>
 <script>
-const TAGS=["بومب","تخن","سريع","متوسط","وقت","جوسي","هيلثي","خفيفة","نادر","مصري","سمك","شتوي"];
+const TAGS=["لحمة","فراخ","بومب","تخن","سريع","متوسط","وقت","جوسي","هيلثي","خفيفة","نادر","مصري","لحمة","فراخ","سمك","شتوي"];
 const LBL={متوسط:"متوسط السرعة",وقت:"محتاج وقت",نادر:"تكرار قليل",بومب:"بومب 💨"};
 const D=[["برجر","لحمة مفرومة + عيش + بطاطس",1,"جوسي سريع تخن"],["صينية لحمة + مكرونة حمرا + سلطة خس","لحمة + طماطم + مكرونة + خس",2,"متوسط"],["ملوخية + أرز + سلطة + فراخ","ملوخية + خضار سلطة + فراخ + أرز",1,"بومب سريع مصري"],["محشي كرنب + فراخ + سلطة خس","كرنب + خضرا + أرز + فراخ + خس",2,"بومب وقت مصري نادر"],["حواوشي + سلطة + طحينة","لحمة مفرومة + عيش بلدي + خضار سلطة",1,"تخن بومب جوسي"],["كشري","عدس + بصل + طماطم + أرز",2,"بومب تخن متوسط نادر"],["شوربة عدس + عيش محمص","عدس + جزر + بطاطس",1,"سريع بومب شتوي نادر"],["مكرونة بشاميل + سلطة خس","لبن + خس + جبنة + مكرونة",2,"تخن سريع"],["سلطة كينوا + فراخ + شوربة","فراخ + بنجر + أفوكادو + رمان + خس + خضرا",1,"خفيفة هيلثي سريع"],["كسادياز فراخ + بطاطس + سلطة","تورتيا + فراخ + فلفل + بطاطس + جبنة",1,"تخن سريع"],["فريك + لحمة + خضار سوتيه","فريك + لحمة + خضار",2,"متوسط هيلثي"],["سمك مشوي + أرز سمك + سلطة + طحينة","سمك + خضار سلطة + أرز",1,"متوسط بومب سمك"],["طاجن جمبري وسمك + أرز سمك","جمبري + سمك + أرز + فلفل",1,"سريع سمك"],["محشي فلفل + لحمة + سلطة","فلفل + أرز + خضرا + لحمة + بصل",2,"وقت تخن مصري نادر"],["نجريسكو + سلطة","مشروم + فراخ + لبن + جبنة + خضار سلطة",2,"تخن وقت"],["حندوقية + مكرونة","فراخ + فلفل + طماطم + مكرونة",1,"سريع جوسي"],["أرز + بامية + سلطة فلفل","بامية + فلفل + ليمون + طماطم + لحمة + أرز",2,"بومب متوسط مصري"],["أرز + بسلة","بسلة + أرز + طماطم + لحمة",2,"متوسط تخن مصري"],["صينية بطاطس باللحمة","بطاطس + طماطم + لحمة",2,"تخن وقت"],["مكرونة حمرا + استربس + سلطة","استربس + طماطم + خضار سلطة + مكرونة",1,"سريع"],["فتة + أرز + لحمة","عيش بلدي + لحمة + طماطم + أرز",2,"تخن وقت مصري"],["سندوتشات فرايد تشيكن","كايزر + فراخ + بطاطس",1,"سريع جوسي"]];let editId=null,pick=null,col=null,meals=[],db=null,canW=true,view="today",sel=new Set(),cur=null,plan=null,loaded=false,delId=null;
 const $=s=>document.querySelector(s);
@@ -52,9 +59,9 @@ const note=t=>{const m=$("#msg");if(m)m.textContent=t};const esc=s=>String(s??""
 const has=(m,t)=>m.t.includes(t);
 const ings=m=>m.i.split(/\s*[+،]\s*/).filter(Boolean);
 const KD=[["🥩 لحمة",/لحم|حواوشي|برجر|كفت|كبد|سجق|ستيك|مفروم|كباب|ضاني/],["🍗 فراخ",/فراخ|دجاج|ستربس|استربس|تشيكن/],["🐟 سمك",/سمك|جمبري|بلطي|ماكريل|تونة/]];
-const kd=(m,i)=>KD[i][1].test(m.n+" "+m.i);const kinds=m=>KD.filter((_,i)=>kd(m,i)).map(k=>k[0]);
+const KW=["لحمة","فراخ","سمك"];const kd=(m,i)=>KD[i][1].test(m.n+" "+m.i)||m.t.includes(["لحمة","فراخ","سمك"][i]);const kinds=m=>KD.filter((_,i)=>kd(m,i)).map(k=>k[0]);
 const dayB=m=>`<div style="margin-top:8px"><span class="tg" style="border:1px solid var(--ac);background:none;color:var(--ac);font-weight:700">تكفي ${m.d==1?"يوم":"يومين"}</span></div>`;
-const tagsH=(m,sd)=>`<div class="tags">${kinds(m).map(k=>`<span class="tg" style="background:var(--ac);color:var(--on)">${k}</span>`).join("")}${m.t.filter(t=>t!=="سمك").map(t=>`<span class="tg">${esc(LBL[t]||t)}</span>`).join("")}</div>`;
+const tagsH=(m,sd)=>`<div class="tags">${kinds(m).map(k=>`<span class="tg" style="background:var(--ac);color:var(--on)">${k}</span>`).join("")}${m.t.filter(t=>!["سمك","لحمة","فراخ"].includes(t)).map(t=>`<span class="tg">${esc(LBL[t]||t)}</span>`).join("")}</div>`;
 const allTags=()=>[...new Set([...TAGS,...meals.flatMap(m=>m.t)])];
 const getTags=()=>[...new Set([...document.querySelectorAll("[data-nt].on")].map(x=>x.dataset.nt).concat(($("#fl").value||"").split(/[,،]/).map(x=>x.trim().slice(0,20)).filter(Boolean)))];
 function formH(m){const e=!!m,t=e?m.t:[];return `<div class="card"><b>${e?"✏️ تعديل الوجبة":"➕ ضيف وجبة"}</b>
@@ -63,6 +70,8 @@ function formH(m){const e=!!m,t=e?m.t:[];return `<div class="card"><b>${e?"✏�
       <div class="tags" style="margin:0 0 8px">${allTags().map(x=>`<button class="tg${t.includes(x)?" on":""}" data-nt="${esc(x)}">${esc(LBL[x]||x)}</button>`).join("")}</div>
       <input id="fl" placeholder="label جديد (افصل بينهم بفاصلة)" maxlength="60">
       <button class="pri" id="${e?"save":"add"}">${e?"حفظ التعديل":"حفظ"}</button>${e?`<button class="sm" id="cancel" style="width:100%;margin-top:6px">إلغاء</button>`:""}</div>`}
+function modalH(){const m=meals.find(x=>x.id===editId);if(!m)return"";
+  return `<div id="mdl" style="position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;z-index:50"><div style="width:100%;max-width:640px;max-height:90%;overflow-y:auto;background:var(--bg);border-radius:20px 20px 0 0;padding:14px 14px calc(14px + env(safe-area-inset-bottom,0px))">${formH(m).replace('class="card"','class="card" style="margin:0"')}</div></div>`}
 let xfer=null,showTx=false;const exp=()=>JSON.stringify(meals.map(m=>({n:m.n,i:m.i,d:m.d,t:m.t})));
 function xferH(){const bt=`<div class="row" style="margin-bottom:12px"><button class="sm" data-x="ex" style="flex:1;padding:8px">Export meals</button><button class="sm" data-x="im" style="flex:1;padding:8px">Import meals</button></div>`;
   if(xfer==="ex")return bt+`<div class="card"><b>Export meals</b><p class="mu">دوس «نسخ الوجبات» والصقها في ملاحظات أو رسالة لنفسك، أو نزّلها كملف. وبعدين افتح أي نسخة تانية من الصفحة واستوردها.</p>${showTx?`<textarea id="xo" readonly rows="6">${esc(exp())}</textarea>`:""}<button class="pri" id="cpy">نسخ الوجبات</button><button class="sm" id="dl" style="width:100%;margin-top:8px;padding:8px">تنزيل كملف</button></div>`;
@@ -71,7 +80,7 @@ function xferH(){const bt=`<div class="row" style="margin-bottom:12px"><button c
 const norm=(id,o)=>({id,n:String(o.n||"").slice(0,80),i:String(o.i||"").slice(0,200),d:o.d==1?1:2,t:Array.isArray(o.t)?o.t.map(x=>String(x).trim().slice(0,20)).filter(Boolean).slice(0,15):[]});
 
 function pickToday(){
-  let pool=meals.filter(m=>[...sel].every(t=>has(m,t)));
+  let pool=meals.filter(m=>[...sel].every(t=>has(m,t)||(KW.includes(t)&&kd(m,KW.indexOf(t)))));
   const common=pool.filter(m=>!has(m,"نادر"));
   if(common.length&&(Math.random()>.12||!pool.length))pool=common;
   const o=pool.filter(m=>m!==cur);
@@ -121,11 +130,12 @@ function render(){
     '<button class="pri" id="regen">🔄 خطة تانية</button>';
     if(!plan||!plan.length)a.innerHTML='<div id="st">محتاج وجبات أكتر عشان أعمل خطة.</div>';
   }else{
-    a.innerHTML=(canW?formH(editId?meals.find(x=>x.id===editId):null):"")+
-    xferH()+`<p class="mu">${meals.length} وجبة</p>`+meals.map(m=>`<div class="card"><div class="row"><p class="big" style="font-size:17px">${esc(m.n)}</p>${canW?`<span><button class="sm" data-ed="${esc(m.id)}">✏️ تعديل</button> <button class="sm red" data-del="${esc(m.id)}">${delId===m.id?"تأكيد الحذف؟":"حذف"}</button></span>`:""}</div><div class="mu">${esc(m.i)}</div>${dayB(m)}${tagsH(m)}</div>`).join("");
+    a.innerHTML=(canW&&!(editId&&meals.some(x=>x.id===editId))?formH(null):"")+
+    xferH()+`<p class="mu">${meals.length} وجبة</p>`+meals.map(m=>editId===m.id&&canW?formH(m):`<div class="card"><div class="row"><p class="big" style="font-size:17px">${esc(m.n)}</p>${canW?`<span><button class="sm" data-ed="${esc(m.id)}">✏️ تعديل</button> <button class="sm red" data-del="${esc(m.id)}">${delId===m.id?"تأكيد الحذف؟":"حذف"}</button></span>`:""}</div><div class="mu">${esc(m.i)}</div>${dayB(m)}${tagsH(m)}</div>`).join("")+(canW&&editId?modalH():"");
   }
 }
 document.addEventListener("click",async e=>{
+  if(e.target.id==="mdl"){editId=null;render();return}
   const b=e.target.closest("button");if(!b)return;
   if(b.dataset.v){view=b.dataset.v;editId=null;render();return}
   if(b.dataset.f){sel.has(b.dataset.f)?sel.delete(b.dataset.f):sel.add(b.dataset.f);cur=null;render();return}
@@ -144,7 +154,7 @@ document.addEventListener("click",async e=>{
     const have=new Set(meals.map(m=>m.n.trim()));let c=0,k=0;b.disabled=true;
     try{for(const o of arr.slice(0,200)){const m=norm("",o||{});if(!m.n||have.has(m.n.trim())){k++;continue}have.add(m.n.trim());await col.doc("m"+Date.now().toString(36)+Math.random().toString(36).slice(2,5)).set({n:m.n,i:m.i,d:m.d,t:m.t});c++}plan=null;xfer=null;note("اتضافت "+c+" وجبة، وتخطّيت "+k+" (موجودة قبل كده).")}catch(e){note("معرفتش أستورد: "+(e&&(e.code||e.message)||"خطأ"))}
     b.disabled=false;render();return}
-  if(b.dataset.ed){editId=b.dataset.ed;render();return}
+  if(b.dataset.ed){editId=b.dataset.ed;render();setTimeout(()=>{const f=$("#fn");if(f)f.scrollIntoView({block:"center",behavior:"smooth"})},60);return}
   if(b.id==="cancel"){editId=null;render();return}
   if(b.id==="save"){const n=$("#fn").value.trim(),i=$("#fi").value.trim();if(!n)return;b.disabled=true;
     try{await col.doc(editId).set({n,i,d:+$("#fd").value,t:getTags()});plan=null;editId=null;note("اتعدّلت ✓")}catch(e){note("معرفتش أحفظ: "+(e&&(e.code||e.message)||"خطأ"))}
@@ -193,6 +203,20 @@ setTimeout(()=>{if(!loaded){loaded=true;render()}},10000);
   loaded=true;render();
 })();
 render();
+
+/* Umami: يتحمّل بعد الموافقة بس */
+const onC=typeof claude!=="undefined";
+const getC=()=>{try{return localStorage.getItem("umc")}catch(_){return null}};
+const setC=v=>{try{localStorage.setItem("umc",v)}catch(_){}};
+function loadU(){if(document.getElementById("um"))return;const t=document.createElement("script");t.id="um";t.defer=true;t.src="https://cloud.umami.is/script.js";t.setAttribute("data-website-id","1462250d-e59c-42f6-a782-1891ad802e27");document.head.appendChild(t)}
+function showCb(){const c=$("#cb");c.innerHTML=`<div class="bx"><b>إحصائيات الزيارات</b><p class="mu" style="margin:6px 0 0">بنستخدم Umami لإحصائيات زيارات مجهولة (الصفحات المفتوحة، نوع الجهاز والمتصفح، والدولة). من غير cookies. اختيارك بيتحفظ في متصفحك وتقدر تغيّره في أي وقت من «إعدادات الخصوصية» أسفل الصفحة. الصفحة بتشتغل كاملة سواء وافقت أو لأ.</p><div class="bt"><button data-c="1">موافق</button><button data-c="0">لأ، شكراً</button></div></div>`;c.hidden=false}
+if(!onC){
+  $("#ft").hidden=false;
+  if(getC()==="1")loadU();else if(getC()===null)showCb();
+  $("#pv").addEventListener("click",showCb);
+  $("#cb").addEventListener("click",e=>{const b=e.target.closest("button[data-c]");if(!b)return;const prev=getC();setC(b.dataset.c);$("#cb").hidden=true;
+    if(b.dataset.c==="1")loadU();else if(prev==="1")location.reload()});
+}
 </script>
 </body>
 </html>
